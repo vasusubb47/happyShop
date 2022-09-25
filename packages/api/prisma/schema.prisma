@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id            String      @id @default(uuid()) @db.Uuid
+  name          String      @db.VarChar(35)
+  dob           DateTime?   @db.Date
+  sex           String      @db.VarChar(10)
+  email         String      @unique @db.VarChar(50)
+  password      String      @db.VarChar(35)
+  password_hash Bytes
+  contact       String?     @db.VarChar(13)
+  type          String      @db.VarChar(10)
+  address       address[]
+  item          item[]
+  billing       billing[]
+  wish_list     wish_list[]
+  cart          cart[]
+  ratting       ratting[]
+}
+
+model address {
+  id      String @id @default(uuid()) @db.Uuid
+  uid     String @unique @db.Uuid
+  city    String @db.VarChar(35)
+  state   String @db.VarChar(35)
+  country String @db.VarChar(35)
+  pin     Int
+
+  userId client @relation(fields: [uid], references: [id], map: "addressOf")
+}
+
+model item {
+  id       String @id @default(uuid()) @db.Uuid
+  sid      String @db.Uuid
+  name     String @unique @db.VarChar(35)
+  price    Float
+  tax      Float
+  quantity Int
+
+  sellerId     client         @relation(fields: [sid], references: [id], map: "soledBy")
+  image        image[]
+  tags         tags[]
+  item_billing item_billing[]
+  wish_list    wish_list[]
+  cart         cart[]
+  ratting      ratting[]
+}
+
+model image {
+  id    String @id @default(uuid()) @db.Uuid
+  itid  String @db.Uuid
+  data  Bytes
+  count Int
+
+  itemId item @relation(fields: [itid], references: [id], map: "imageOf")
+}
+
+model tags {
+  id       String @id @default(uuid()) @db.Uuid
+  itid     String @db.Uuid
+  category String @db.VarChar(15)
+
+  itemId item @relation(fields: [itid], references: [id], map: "tagsOf")
+}
+
+model billing {
+  id             String   @id @default(uuid()) @db.Uuid
+  uid            String   @db.Uuid
+  total          Float
+  tax            Float
+  total_with_tax Float
+  payment_type   String   @db.VarChar(20)
+  time           DateTime @default(now()) @db.Time()
+
+  userId       client         @relation(fields: [uid], references: [id], map: "billOf")
+  item_billing item_billing[]
+}
+
+model item_billing {
+  id       String @id @default(uuid()) @db.Uuid
+  itid     String @db.Uuid
+  bid      String @db.Uuid
+  quantity Int
+  price    Float
+  tax      Float
+
+  itemId    item    @relation(fields: [itid], references: [id], map: "billOfitem")
+  billingId billing @relation(fields: [bid], references: [id], map: "billingOfitem")
+}
+
+model wish_list {
+  id   String @id @default(uuid()) @db.Uuid
+  uid  String @db.Uuid
+  itid String @db.Uuid
+
+  userId client @relation(fields: [uid], references: [id], map: "wishListOf")
+  itemId item   @relation(fields: [itid], references: [id], map: "wishListOfItem")
+}
+
+model cart {
+  id       String @id @default(uuid()) @db.Uuid
+  uid      String @db.Uuid
+  itid     String @db.Uuid
+  quantity Int
+
+  userId client @relation(fields: [uid], references: [id], map: "cartOf")
+  itemId item   @relation(fields: [itid], references: [id], map: "cartOfItem")
+}
+
+model ratting {
+  id       String  @id @default(uuid()) @db.Uuid
+  uid      String  @db.Uuid
+  itid     String  @db.Uuid
+  ratting  Int
+  comments String? @db.VarChar(255)
+
+  userId client @relation(fields: [uid], references: [id], map: "rattingOf")
+  itemId item   @relation(fields: [itid], references: [id], map: "rattingOfItem")
+}
