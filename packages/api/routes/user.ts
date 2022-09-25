@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 
 import { userAuth } from "./middleware/index";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 const userRouter = express.Router();
 const saltRounds = 10;
 
