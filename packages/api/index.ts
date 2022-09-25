@@ -5,15 +5,14 @@ const upload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const { PrismaClient }  = require('@prisma/client');
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 const app = express();
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(upload());
 
-const PORT = 8088;
-const saltRounds = 10;
+const PORT = 8087;
 
 import {
   userRouter,
